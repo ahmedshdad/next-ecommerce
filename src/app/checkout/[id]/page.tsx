@@ -37,7 +37,7 @@ export default function Checkout() {
         toast.success("Order placed successfully")
         router.push('/allorders')
       } else if (paymentFlag === 'online') {
-        const data = await makeOnlinePayment(id, 'http://localhost:3000', values)
+        const data = await makeOnlinePayment(id, 'https://next-ecommerce-lac-rho.vercel.app', values)
         if (data.status === 'success') {
           window.location.href = data.session.url
         }
