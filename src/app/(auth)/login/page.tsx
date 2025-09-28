@@ -111,6 +111,12 @@ export default function Login() {
                   Forgot Password?
                 </Link>
               </div>
+              <div className="text-center mt-4">
+  <span className="text-sm text-gray-600">Don’t have an account? </span>
+  <Link className="text-green-600 font-semibold hover:underline text-sm" href={'/register'}>
+    Create one
+  </Link>
+</div>
             </form>
           </Form>
         </div>
