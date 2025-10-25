@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./_component/Navbar/Navbar";
- 
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import { Toaster } from "@/components/ui/sonner";
 import MyProvider from "@/myProvider/MyProvider";
 import CartProvider from "./context/cart.context";
- 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,22 +29,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}>
+        <MyProvider>
+          <CartProvider>
+            <Toaster position='top-right' />
 
-        <div className="container">
-          <MyProvider >
-            <CartProvider>
+           
+            <div className="fixed top-0 left-0 w-full z-50 bg-white shadow">
+              <div className="container">
+                <Navbar />
+              </div>
+            </div>
 
-              <Toaster position='top-right' />
-              <Navbar />
+          
+            <div className="pt-24 container">
               {children}
-              
+            </div>
 
-            </CartProvider>
-          </MyProvider>
-
-
-        </div>
+          </CartProvider>
+        </MyProvider>
       </body>
     </html>
   );
