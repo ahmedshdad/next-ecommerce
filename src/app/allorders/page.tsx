@@ -1,105 +1,64 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { getUserOrders } from '@/Api/order.api'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
-export default function Page() {
-  const [orders, setOrders] = useState<any[]>([])  
+export default function AllOrdersPage() {
+  const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  async function getOrders() {
-    try {
-      const response = await fetch('https://ecommerce.routemisr.com/api/v1/orders/', {
-        cache: "no-store"  
-      })
-      const data = await response.json()
-      console.log(data)
-      setOrders(data?.data || data) 
-    } catch (error) {
-      console.error("Error fetching orders:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
-    getOrders()
+    async function loadOrders() {
+      try {
+        const data = await getUserOrders()
+        setOrders(data)
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to fetch orders')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadOrders()
   }, [])
 
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <i className="text-green-500 fa-3x fa-solid fa-spinner fa-spin-pulse"></i>
+    </div>
+  )
+
   return (
-    <div className="p-6">
-      <title>Orders</title>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto overflow-x-auto">
+      <h2 className="text-3xl font-bold text-green-600 text-center mb-6">My Orders</h2>
 
-      {loading ? (
-        <div className='flex justify-center items-center h-screen'>
-          <i className="text-green-500 fa-3x fa-solid fa-spinner fa-spin-pulse"></i>
+      {orders.length === 0 ? (
+        <div className="text-gray-500 text-center text-lg py-10">
+          No orders found.
         </div>
-      ) : orders.length === 0 ? (
-        <p className="text-center text-red-500 font-medium">No orders found</p>
       ) : (
-        <>
-          <h2 className="text-green-600 text-2xl font-bold text-center mb-6">
-            My Orders
-          </h2>
-
-          {/* ✅ Desktop Table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full border border-gray-200 rounded-lg shadow-md overflow-hidden">
-              <thead className="bg-green-50 text-green-700">
-                <tr>
-                  <th className="px-4 py-3 text-center border-r">Order ID</th>
-                  <th className="px-4 py-3 text-center border-r">Total Price</th>
-                  <th className="px-4 py-3 text-center border-r">Payment</th>
-                  <th className="px-4 py-3 text-center border-r">Date</th>
-                  <th className="px-4 py-3 text-center">Items</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {orders.map((order: any, index: number) => (
-                  <tr 
-                    key={order._id} 
-                    className={index % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100"}
-                  >
-                    <td className="text-center px-4 py-2">{order._id}</td>
-                    <td className="text-center px-4 py-2 font-semibold text-green-600">
-                      💰 {order.totalOrderPrice} EGP
-                    </td>
-                    <td className="text-center px-4 py-2">{order.paymentMethodType}</td>
-                    <td className="text-center px-4 py-2">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="text-center px-4 py-2">
-                      🛒 {order.cartItems?.length || 0} Items
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* ✅ Mobile Cards */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
+        <table className="w-full border-collapse border border-gray-300">
+          <thead className="bg-green-100">
+            <tr>
+              <th className="border border-gray-300 px-3 py-2">Order ID</th>
+              <th className="border border-gray-300 px-3 py-2">Date</th>
+              <th className="border border-gray-300 px-3 py-2">Payment</th>
+              <th className="border border-gray-300 px-3 py-2">Total Price</th>
+              <th className="border border-gray-300 px-3 py-2">Items</th>
+            </tr>
+          </thead>
+          <tbody>
             {orders.map((order: any) => (
-              <div 
-                key={order._id} 
-                className="p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition"
-              >
-                <p className="text-sm text-gray-500">Order ID: 
-                  <span className="font-medium text-gray-800"> {order._id}</span>
-                </p>
-                <p className="text-green-600 font-semibold mt-2">
-                  💰 {order.totalOrderPrice} EGP
-                </p>
-                <p className="text-sm text-gray-600">Payment: {order.paymentMethodType}</p>
-                <p className="text-sm text-gray-600">
-                  Date: {new Date(order.createdAt).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-700 mt-1">
-                  🛒 {order.cartItems?.length || 0} Items
-                </p>
-              </div>
+              <tr key={order._id} className="odd:bg-white even:bg-gray-50">
+                <td className="border border-gray-300 px-3 py-2 break-all">{order._id}</td>
+                <td className="border border-gray-300 px-3 py-2">{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td className="border border-gray-300 px-3 py-2 capitalize">{order.paymentMethodType}</td>
+                <td className="border border-gray-300 px-3 py-2 text-green-600 font-bold">{order.totalOrderPrice} EGP</td>
+                <td className="border border-gray-300 px-3 py-2 text-center">{order.cartItems?.length || 0}</td>
+              </tr>
             ))}
-          </div>
-        </>
+          </tbody>
+        </table>
       )}
     </div>
   )

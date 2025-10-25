@@ -43,6 +43,7 @@ export default function Navbar() {
           <li><Link href="/">Home</Link></li>
           <li><Link href="/Products">Products</Link></li>
           <li><Link href="/Categories">Categories</Link></li>
+          <li><Link href="/Brands">Brands</Link></li>
           
           {data && <li><Link href="/allorders">Orders</Link></li>}
         </ul>
